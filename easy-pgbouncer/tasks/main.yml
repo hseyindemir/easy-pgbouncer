@@ -1,2 +1,16 @@
 ---
 # tasks file for easy-pgbouncer
+- name: Install OpenJDK on Operating System for RPM
+  yum:
+    name: pgbouncer
+    state: present
+  when: >-
+    ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat
+    Enterprise Linux'
+
+- name: Install OpenJDK on Operating System for DEB
+  apt:
+    name: pgbouncer
+    state: present
+    update_cache: "yes"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
