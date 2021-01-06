@@ -14,3 +14,24 @@
     state: present
     update_cache: "yes"
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Grant Permissions to pgbouncer directory for postgresql user
+  file:
+    path: /etc/pgbouncer/
+    owner: postgres
+    group: postgres
+    mode: '0700'
+
+- name: Grant Permissions to pgbouncer pid directory for postgresql user
+  file:
+    path: /var/run/pgbouncer/
+    owner: postgres
+    group: postgres
+    mode: '0700'
+
+- name: Grant Permissions to pgbouncer log directory for postgresql user
+  file:
+    path: /var/log/pgbouncer/
+    owner: postgres
+    group: postgres
+    mode: '0700'
