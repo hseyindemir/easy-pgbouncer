@@ -1,5 +1,9 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: all
+  become: true
   roles:
     - easy-pgbouncer
+  vars:
+    max_connections: 200
+    hba_file_location: /pgsqldata/hba.conf
+    bouncer_pool_mode: session
