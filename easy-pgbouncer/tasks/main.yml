@@ -45,7 +45,7 @@
     mode: '0644'
 
 - name: Copy pgbouncer Configuration File with postgres Permission(0644)
-  copy:
+  template:
     src: files/pgbouncer.j2
     dest: /etc/pgbouncer/pgbouncer.ini
     owner: postgres
