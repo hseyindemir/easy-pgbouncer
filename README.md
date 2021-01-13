@@ -14,6 +14,7 @@ Role Variables
 * max_connections: 200
 * hba_file_location: '/pgsql-data/pg_hba.conf'
 * bouncer_pool_mode: 'session'
+* default_pool_size: 100
 
 
 Example Playbook
@@ -29,6 +30,7 @@ Example Playbook
     max_connections: 200
     hba_file_location: /pgsqldata/hba.conf
     bouncer_pool_mode: session
+    default_pool_size: 100
 ```
 
 License

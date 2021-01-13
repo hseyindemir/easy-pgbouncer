@@ -7,3 +7,4 @@
     max_connections: 200
     hba_file_location: /pgsqldata/hba.conf
     bouncer_pool_mode: session
+    default_pool_size: 100
