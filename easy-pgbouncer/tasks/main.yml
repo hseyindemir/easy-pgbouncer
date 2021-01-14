@@ -51,3 +51,9 @@
     owner: postgres
     group: postgres
     mode: '0644'
+
+- name: Start pgbouncer Service on Operating System
+  service:
+    name: pgbouncer
+    state: started
+    enabled: 'yes'
