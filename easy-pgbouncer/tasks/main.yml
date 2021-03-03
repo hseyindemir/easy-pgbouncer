@@ -1,6 +1,6 @@
 ---
 # tasks file for easy-pgbouncer
-- name: Install OpenJDK on Operating System for RPM
+- name: Install PgBouncer on Operating System for RPM
   yum:
     name: pgbouncer
     state: present
@@ -8,7 +8,7 @@
     ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat
     Enterprise Linux'
 
-- name: Install OpenJDK on Operating System for DEB
+- name: Install PgBouncer on Operating System for DEB
   apt:
     name: pgbouncer
     state: present
