@@ -1,4 +1,4 @@
 - src: https://github.com/hseyindemir/easy-pgbouncer.git
   scm: git
-  version: "0.0.1"
+  version: "0.0.5"
   name: pgbouncer
