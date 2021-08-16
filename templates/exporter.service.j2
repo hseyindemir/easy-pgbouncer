@@ -1,0 +1,13 @@
+[Unit]
+Description=PostgreSQL Pgbouncer Exporter Service File
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/local/bin/pgbouncer_exporter --pgBouncer.connectionString=postgres://{{ pgbouncer_service_user }}@127.0.0.1:6437/pgbouncer?sslmode=disable --pgBouncer.pid-file=/var/run/pgbouncer/pgbouncer.pid --web.listen-address={{ ansible_default_ipv4.address }}:9127
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

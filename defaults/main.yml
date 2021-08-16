@@ -1,0 +1,6 @@
+---
+# defaults file for pgbouncer
+max_connections: 500
+default_pool_size: 100
+reserve_pool_size: 50
+pgbouncer_version: 1.16

@@ -1,0 +1,182 @@
+---
+# tasks file for pgbouncer
+
+- name: Install PgBouncer on Operating System for RPM
+  yum:
+    name: pgbouncer
+    state: present
+  tags: 
+  - pgbouncer_only
+  when: >-
+    ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat
+    Enterprise Linux'
+  
+
+- name: Install pgbouncer related pre-req packages on DEB
+  apt:
+    name:
+      - wget
+      - curl
+      - make 
+      - gcc 
+      - libpq-dev 
+      - libssl-dev 
+      - libxml2-dev 
+      - pkg-config
+      - liblz4-dev 
+      - libzstd-dev 
+      - libbz2-dev 
+      - libz-dev
+      - libevent-dev
+      - build-essential
+    update_cache: yes
+    state: present
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Create directory for storing build file of pgbouncer
+  file:
+    path: /tmp/pgbouncerbuild
+    state: directory
+  
+- name: Get pgbouncer binary
+  get_url:
+    url: https://github.com/pgbouncer/pgbouncer/releases/download/pgbouncer_'{{ pgbouncer_version | replace(".","_") }}'/pgbouncer-{{ pgbouncer_version }}.tar.gz
+    dest: /tmp/pgbouncerbuild/{{ pgbouncer_version }}.tar.gz
+    mode: '0700'
+
+- name: Extract pgbouncer .tar.gz
+  unarchive:
+    src: /tmp/pgbouncerbuild/{{ pgbouncer_version }}.tar.gz
+    dest: /tmp/pgbouncerbuild/
+
+- name: Build pgbouncer on operating system
+  shell: cd /tmp/pgbouncerbuild/pgbouncer-{{ pgbouncer_version }} && ./configure --prefix=/usr/local && make && make install
+  args:
+    executable: /bin/bash
+
+- name: Copy pgbouncer binary to usr bin default dir with permissions
+  copy:
+    src: /tmp/pgbouncerbuild/pgbouncer-{{ pgbouncer_version }}/pgbouncer
+    dest: /usr/bin
+    owner: postgres
+    group: postgres
+    mode: '0755'
+    remote_src: yes
+
+- name: Copy pgbouncer Service File with root Permission(0644)
+  copy:
+    src: templates/pgbouncer.service
+    dest: /usr/lib/systemd/system/pgbouncer.service
+    owner: root
+    group: root
+    mode: '0644'
+  tags: 
+  - pgbouncer_only
+
+- name: Create pgbouncer log directory with postgresql permissions
+  file:
+    path: /var/log/pgbouncer
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0755'
+
+- name: Create pgbouncer pid directory with postgresql permissions
+  file:
+    path: /var/run/pgbouncer
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0755'
+
+- name: Copy pgbouncer Configuration File with postgres Permission(0644)
+  template:
+    src: templates/pgbouncer.j2
+    dest: /etc/pgbouncer/pgbouncer.ini
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  tags: 
+  - pgbouncer_only
+
+- name: Copy pgbouncer hba File
+  template:
+    src: templates/pgbouncer_hba.conf
+    dest: /etc/pgbouncer/pgbouncer_hba.conf
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  tags: 
+  - pgbouncer_only
+
+- name: Copy exporter builder staff to remote server DEB
+  template:
+    src: files/install_exporter_debian.sh
+    dest: /tmp/install_exporter_debian.sh
+    owner: root
+    group: root
+    mode: '0775'
+  tags: 
+  - exporter_only
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Copy exporter builder staff to remote server RHEL
+  template:
+    src: files/install_exporter_rhel.sh
+    dest: /tmp/install_exporter_rhel.sh
+    owner: root
+    group: root
+    mode: '0775'
+  tags: 
+  - exporter_only
+  when: >-
+    ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat
+    Enterprise Linux'
+
+- name: Exec exporter shell for RHEL
+  become: yes
+  shell : /tmp/install_exporter_rhel.sh
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  tags: 
+  - exporter_only
+  when: >-
+    ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat
+    Enterprise Linux'
+
+- name: Exec exporter shell for DEB
+  become: yes
+  shell : /tmp/install_exporter_debian.sh
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  tags: 
+  - exporter_only
+  when: >-
+    ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat
+    Enterprise Linux'
+  
+- name: Copy pgbouncer exporter Service File with root Permission(0644)
+  template:
+    src: templates/exporter.service.j2
+    dest: /usr/lib/systemd/system/pgbouncer_exporter.service
+    owner: root
+    group: root
+    mode: '0644'
+  tags: 
+  - exporter_only
+
+- name: Start pgbouncer service
+  systemd:
+    state: started
+    name: pgbouncer
+  tags: 
+  - pgbouncer_only
+
+- name: Start pgbouncer exporter service
+  systemd:
+    state: started
+    name: pgbouncer_exporter
+  tags: 
+  - exporter_only

@@ -1,25 +1,39 @@
 [databases]
-* = port=5432 auth_user=postgres
+* = port=5432 host=127.0.0.1
 [pgbouncer]
 logfile = /var/log/pgbouncer/pgbouncer.log
 pidfile = /var/run/pgbouncer/pgbouncer.pid
-listen_addr = 0.0.0.0
+listen_addr = *
 listen_port = 6437
 auth_type = hba
-auth_hba_file = {{ hba_file_location }}
+auth_hba_file = /etc/pgbouncer/pgbouncer_hba.conf
 admin_users = postgres
 stats_users = postgres
-pool_mode = {{ bouncer_pool_mode }}
+pool_mode = session
+unix_socket_dir = /tmp
+unix_socket_mode = 0777
+unix_socket_group =
 ignore_startup_parameters = intervalStyle,application_name,extra_float_digits
 max_client_conn = {{ max_connections }}
 default_pool_size = {{ default_pool_size }}
-reserve_pool_size = 25
+reserve_pool_size = {{ reserve_pool_size }}
+log_connections = 1
+log_disconnections = 1
+log_pooler_errors = 1
+log_stats = 1
+verbose = 0
+server_check_query = select 1
+server_check_delay = 30
+server_fast_close = 0
+application_name_add_host = 1
+stats_period = 60
 reserve_pool_timeout = 3
 server_lifetime = 300
 server_idle_timeout = 60
-server_connect_timeout = 5
-server_login_retry = 1
+server_connect_timeout = 1
+server_login_retry = 5
 query_timeout = 60
 query_wait_timeout = 60
 client_idle_timeout = 60
 client_login_timeout = 60
+so_reuseport=1

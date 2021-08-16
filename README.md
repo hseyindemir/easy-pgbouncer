@@ -1,44 +1,53 @@
 Role Name
 =========
 
-easy-pgbouncer is a role that install and configures pgbouncer for PostgreSQL databases. 
+pgbouncer
 
-Requirements
+Requirements-localhost
 ------------
 
-In order to enable and use pgbouncer PostgreSQL must be installed on the server.
+* ansible>=2.9.6
 
-Role Variables
---------------
-
-* max_connections: 200
-* hba_file_location: '/pgsql-data/pg_hba.conf'
-* bouncer_pool_mode: 'session'
-* default_pool_size: 100
+Requirements-remotehost
+------------
+* postgresql>=9.6
+* go>=1.15.5
 
 
 Example Playbook
 ----------------
 
-```
+
+```yaml
 ---
 - hosts: all
   become: true
   roles:
-    - easy-pgbouncer
-  vars:
-    max_connections: 200
-    hba_file_location: /pgsqldata/hba.conf
-    bouncer_pool_mode: session
-    default_pool_size: 100
+    - { role: pgbouncer }
 ```
 
+Example Inventory and Execution
+----------------
+The example bash command the below responsible for only installing exporter part for pgbouncer
+```bash 
+
+ansible-playbook -i inventory test.yml --tags=exporter_only
+
+
+```
+The example bash command the below responsible for only installing pgbouncer
+```bash 
+
+ansible-playbook -i inventory test.yml --tags=pgbouncer_only
+
+
+```
 License
 -------
 
-BSD
+kafanıza göre
 
 Author Information
 ------------------
 
-Hüseyin Demir
+* Hüseyin Demir
