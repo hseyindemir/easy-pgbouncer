@@ -109,6 +109,14 @@
   tags: 
   - pgbouncer_only
 
+- name: Create pgbouncer userlist file with postgresql permissions
+  file:
+    path: /etc/pgbouncer/userlist.txt
+    state: touch
+    owner: postgres
+    group: postgres
+    mode: '0644'
+
 - name: Copy pgbouncer hba File
   template:
     src: templates/pgbouncer_hba.conf
